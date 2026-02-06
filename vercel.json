@@ -1,7 +1,14 @@
 {
   \"version\": 2,
   \"functions\": {
-    \"api/*.js\": { \"runtime\": \"nodejs18.x\" }
+    \"api/*.js\": {
+      \"runtime\": \"nodejs18.x\"
+    }
   },
-  \"rewrites\": [{ \"source\": \"/(.*)\", \"destination\": \"/index.html\" }]
+  \"rewrites\": [
+    {
+      \"source\": \"/(?!api/.*).*\", 
+      \"destination\": \"/index.html\"
+    }
+  ]
 }
