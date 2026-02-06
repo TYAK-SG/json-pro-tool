@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Pro Tool - Validate, Minify, Convert & More</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f5f7fa; color: #333; }
+        .header { text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 20px; }
+        .input-group { margin-bottom: 20px; }
+        textarea { width: 100%; height: 200px; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-family: monospace; font-size: 14px; box-sizing: border-box; }
+        textarea:focus { border-color: #667eea; outline: none; }
+        .buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        button { padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.3s; }
+        button:hover { background: #5a67d8; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .output { background: #fff; border: 2px solid #ddd; border-radius: 8px; padding: 20px; min-height: 200px; font-family: monospace; white-space: pre-wrap; }
+        .status { padding: 10px; border-radius: 6px; margin-top: 10px; font-weight: bold; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .pro { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #333; text-align: center; padding: 15px; border-radius: 10px; margin: 20px 0; }
+        .api-docs { background: #e9ecef; padding: 20px; border-radius: 8px; margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛠️ JSON Pro Tool</h1>
+        <p>Professional JSON Validator, Formatter, Converter | Free Tier: 10 req/day | <a href="#pro" style="color: #ffd;">Pro Unlimited $5/mo</a></p>
+    </div>
+    <div class="input-group">
+        <label>Input JSON:</label>
+        <textarea id="input" placeholder='{"example": "Paste your JSON here..."}'></textarea>
+    </div>
+    <div class="buttons">
+        <button onclick="validate()">✅ Validate</button>
+        <button onclick="minify()">📦 Minify</button>
+        <button onclick="prettify()">🎨 Prettify</button>
+        <button onclick="toCSV()">📊 To CSV</button>
+        <button onclick="clearOutput()">🗑️ Clear</button>
+    </div>
+    <div id="output" class="output">Results appear here...</div>
+    <div id="status"></div>
+    <div class="pro" id="pro">
+        <h3>Go Pro: Unlimited Requests + Batch Processing</h3>
+        <p>Subscribe for $5/month via Stripe. API Key for integrations.</p>
+        <!-- Stripe button placeholder -->
+    </div>
+    <div class="api-docs">
+        <h3>API Docs (POST /api/{action})</h3>
+        <p>Body: {json: "..."} | Headers: X-API-Key (pro)</p>
+        <ul>
+            <li>/api/validate → {valid: bool, errors: []}</li>
+            <li>/api/minify → minified string</li>
+            <li>/api/prettify → formatted string</li>
+            <li>/api/to-csv → CSV string</li>
+        </ul>
+    </div>
+    <script>
+        async function callAPI(action, data) {
+            const resp = await fetch(`/api/${action}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({json: data})
+            });
+            return await resp.json();
+        }
+        function showStatus(msg, isError = false) {
+            const status = document.getElementById('status');
+            status.textContent = msg;
+            status.className = `status ${isError ? 'error' : 'success'}`;
+        }
+        function showOutput(json) {
+            document.getElementById('output').textContent = JSON.stringify(json, null, 2);
+        }
+        async function validate() {
+            const input = document.getElementById('input').value;
+            if (!input) return showStatus('Enter JSON first!');
+            try {
+                const res = await callAPI('validate', input);
+                showOutput(res);
+                showStatus(res.valid ? 'Valid JSON! 🎉' : `Invalid: ${res.errors[0]}`);
+            } catch(e) { showStatus(e.message, true); }
+        }
+        async function minify() {
+            // Similar for minify, prettify, toCSV
+            const input = document.getElementById('input').value;
+            const res = await callAPI('minify', input);
+            document.getElementById('output').textContent = res.result;
+            showStatus('Minified! 📦');
+        }
+        // Add other functions similarly...
+        async function prettify() { /* impl */ }
+        async function toCSV() { /* impl */ }
+        function clearOutput() {
+            document.getElementById('output').textContent = '';
+            document.getElementById('status').textContent = '';
+        }
+    </script>
+</body>
+</html>
